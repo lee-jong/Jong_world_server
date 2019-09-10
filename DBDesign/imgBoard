@@ -1,0 +1,13 @@
+테이블 생성
+create table imgTable (
+   seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   title varchar(30),
+   sub_title varchar(30),
+   content varchar(300),
+   date timestamp not null default now(),
+   img varchar(500)
+)
+
+
+mySQL 설정
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root'
