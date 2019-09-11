@@ -2,6 +2,7 @@ const mysql = require('mysql')
 const dbconfig = require('../config/database')
 const connection = mysql.createConnection(dbconfig)
 const path = require('path')
+const fs = require('fs')
 
 // file upload
 const multer = require('multer')
@@ -19,16 +20,27 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 module.exports = app => {
-    app.get('/imgBoard', (req, res) => {
-        let sql = `SELECT * from imgTable`
+    app.post('/imgBoard', (req, res) => {
+        let sql = `SELECT * from imgTable orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
+        let sql2 = `SELECT COUNT(*) from imgTable`
         connection.query(sql, (err, result) => {
             if (err) return res.json({ status: 500, message: 'list call server error' })
             if (!result) return res.json({ status: 404, message: 'not content' })
-            return res.send({ status: 200, message: 'get imgList success', result })
+
+            connection.query(sql2, (err2, result2) => {
+                if (err2) return res.json({ status: 500, message: 'err' })
+                let total = result2[0]['COUNT(*)']
+                return res.send({
+                    status: 200,
+                    message: 'get imgList success',
+                    result,
+                    total
+                })
+            })
         })
     })
 
-    app.post('/imgBoard', upload.single('file'), (req, res) => {
+    app.post('/imgInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
         let sql = `INSERT INTO imgTable(title, sub_title, content, img) VALUE ('${data.title}', '${data.place}', '${data.content}', '${req.file.filename}')`
         connection.query(sql, (err, result) => {
@@ -42,7 +54,7 @@ module.exports = app => {
         let seq = `delete from imgtable where seq =${req.body.seq}`
         connection.query(seq, (err, result) => {
             if (err) return res.json({ status: 500, message: 'delete image server error' })
-            console.log('one image recode deleted')
+            fs.unlinkSync(path.join(__dirname, `../images/imgBoard/${req.body.img}`))
             return res.json({ status: 200, message: 'success delete image' })
         })
     })
