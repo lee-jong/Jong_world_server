@@ -40,6 +40,47 @@ module.exports = app => {
         })
     })
 
+    app.post('/searchImgBoard', (req, res) => {
+        let sql = `SELECT * from imgTable where title like "%${req.body.search}%"`
+        let sql2 = `SELECT * from imgTable where sub_title like "%${req.body.search}%"`
+        let sql3 = `SELECT * from imgTable where content like "%${req.body.search}%"`
+        let sql4 = `SELECT * from imgTable where date like "%${req.body.search}%"`
+
+        switch(req.body.type){
+            case 'title' : 
+            connection.query(sql, (err, result) => {
+                if(err) return  res.json({ status:500, message : 'search list call server error'})
+                if(!result) return res.json({status : 404, message : 'not content'})
+                res.json({status:200, message : 'get search imgList success'})
+               break; 
+            })
+
+            case 'sub_title' : 
+            connection.query(sql2, (err, result) => {
+                if(err) return  res.json({ status:500, message : 'search list call server error'})
+                if(!result) return res.json({status : 404, message : 'not content'})
+                res.json({status:200, message : 'get search imgList success'})
+               break; 
+            })
+
+            case 'content' : 
+            connection.query(sql3, (err, result) => {
+                if(err) return  res.json({ status:500, message : 'search list call server error'})
+                if(!result) return res.json({status : 404, message : 'not content'})
+                res.json({status:200, message : 'get search imgList success'})
+               break; 
+            })
+            //data로 하는 것이기에 check 해봐야함
+            case 'date' : 
+            connection.query(sql4, (err, result) => {
+                if(err) return  res.json({ status:500, message : 'search list call server error'})
+                if(!result) return res.json({status : 404, message : 'not content'})
+                res.json({status:200, message : 'get search imgList success'})
+               break; 
+            })
+        }
+    })
+
     app.post('/imgInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
         let sql = `INSERT INTO imgTable(title, sub_title, content, img) VALUE ('${data.title}', '${data.place}', '${data.content}', '${req.file.filename}')`
