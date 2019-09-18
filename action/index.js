@@ -21,62 +21,43 @@ const upload = multer({ storage: storage })
 
 module.exports = app => {
     app.post('/imgBoard', (req, res) => {
-        let sql = `SELECT * from imgTable orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
-        let sql2 = `SELECT COUNT(*) from imgTable`
-        connection.query(sql, (err, result) => {
-            if (err) return res.json({ status: 500, message: 'list call server error' })
-            if (!result) return res.json({ status: 404, message: 'not content' })
+        if (!req.body.search) {
+            let sql = `SELECT * from imgTable orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
+            let sql2 = `SELECT COUNT(*) from imgTable`
+            connection.query(sql, (err, result) => {
+                if (err) return res.json({ status: 500, message: 'list call server error' })
+                if (!result) return res.json({ status: 404, message: 'not content' })
 
-            connection.query(sql2, (err2, result2) => {
-                if (err2) return res.json({ status: 500, message: 'err' })
-                let total = result2[0]['COUNT(*)']
-                return res.send({
-                    status: 200,
-                    message: 'get imgList success',
-                    result,
-                    total
+                connection.query(sql2, (err2, result2) => {
+                    if (err2) return res.json({ status: 500, message: 'total err' })
+                    let total = result2[0]['COUNT(*)']
+                    return res.json({
+                        status: 200,
+                        message: 'get imgList success',
+                        result,
+                        total
+                    })
                 })
             })
-        })
-    })
+        }
 
-    app.post('/searchImgBoard', (req, res) => {
-        let sql = `SELECT * from imgTable where title like "%${req.body.search}%"`
-        let sql2 = `SELECT * from imgTable where sub_title like "%${req.body.search}%"`
-        let sql3 = `SELECT * from imgTable where content like "%${req.body.search}%"`
-        let sql4 = `SELECT * from imgTable where date like "%${req.body.search}%"`
-
-        switch(req.body.type){
-            case 'title' : 
+        if (req.body.search) {
+            let sql = `SELECT * from imgTable where ${req.body.type} like "%${req.body.search}%" LIMIT ${req.body.offset}, ${req.body.limit}`
+            let sql2 = `SELECT COUNT(*) from imgTable where ${req.body.type} like "%${req.body.search}%"`
             connection.query(sql, (err, result) => {
-                if(err) return  res.json({ status:500, message : 'search list call server error'})
-                if(!result) return res.json({status : 404, message : 'not content'})
-                res.json({status:200, message : 'get search imgList success'})
-               break; 
-            })
+                if (err) return res.json({ status: 500, message: 'search list call server error' })
+                if (!result) return res.json({ status: 404, message: 'not content' })
 
-            case 'sub_title' : 
-            connection.query(sql2, (err, result) => {
-                if(err) return  res.json({ status:500, message : 'search list call server error'})
-                if(!result) return res.json({status : 404, message : 'not content'})
-                res.json({status:200, message : 'get search imgList success'})
-               break; 
-            })
-
-            case 'content' : 
-            connection.query(sql3, (err, result) => {
-                if(err) return  res.json({ status:500, message : 'search list call server error'})
-                if(!result) return res.json({status : 404, message : 'not content'})
-                res.json({status:200, message : 'get search imgList success'})
-               break; 
-            })
-            //data로 하는 것이기에 check 해봐야함
-            case 'date' : 
-            connection.query(sql4, (err, result) => {
-                if(err) return  res.json({ status:500, message : 'search list call server error'})
-                if(!result) return res.json({status : 404, message : 'not content'})
-                res.json({status:200, message : 'get search imgList success'})
-               break; 
+                connection.query(sql2, (err2, result2) => {
+                    if (err2) return res.json({ status: 500, message: 'total err' })
+                    let total = result2[0]['COUNT(*)']
+                    return res.json({
+                        status: 200,
+                        message: 'get title search imgList success',
+                        result,
+                        total
+                    })
+                })
             })
         }
     })
@@ -86,7 +67,6 @@ module.exports = app => {
         let sql = `INSERT INTO imgTable(title, sub_title, content, img) VALUE ('${data.title}', '${data.place}', '${data.content}', '${req.file.filename}')`
         connection.query(sql, (err, result) => {
             if (err) return res.json({ status: 500, message: 'insert image server error' })
-            console.log('one image recode inserted')
             return res.json({ status: 200, message: 'success data insert' })
         })
     })
