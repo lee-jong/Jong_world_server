@@ -10,6 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.use('/static', express.static(__dirname + '/images/imgBoard'))
+app.use('/static2', express.static(__dirname + '/images/developerBoard'))
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
@@ -18,8 +19,10 @@ app.use((req, res, next) => {
 })
 
 //my sql config
-const action = require('./action')
-action(app)
+const imgboard = require('./action/imgboard')
+imgboard(app)
+const developer = require('./action/developer')
+developer(app)
 
 io.on('connection', function(socket) {
     console.log('user connected')

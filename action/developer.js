@@ -9,7 +9,7 @@ const multer = require('multer')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        let upload = path.join(__dirname, `../images/imgBoard`)
+        let upload = path.join(__dirname, `../images/developerBoard`)
         cb(null, upload)
     },
     filename: (req, file, cb) => {
@@ -20,20 +20,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 module.exports = app => {
-    app.post('/imgBoard', (req, res) => {
+    app.post('/developerList', (req, res) => {
         if (!req.body.search) {
-            let sql = `SELECT * from imgTable orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
-            let sql2 = `SELECT COUNT(*) from imgTable`
+            let sql = `SELECT * from developer orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
+            let sql2 = `SELECT COUNT(*) from developer`
             connection.query(sql, (err, result) => {
                 if (err) return res.json({ status: 500, message: 'list call server error' })
-                if (!result) return res.json({ status: 404, message: 'not content' })
-
+                console.log('???')
+                if (result.length === 0) return res.json({ status: 404, message: 'not content' })
                 connection.query(sql2, (err2, result2) => {
                     if (err2) return res.json({ status: 500, message: 'total err' })
                     let total = result2[0]['COUNT(*)']
                     return res.json({
                         status: 200,
-                        message: 'get imgList success',
+                        message: 'get developer success',
                         result,
                         total
                     })
@@ -42,18 +42,18 @@ module.exports = app => {
         }
 
         if (req.body.search) {
-            let sql = `SELECT * from imgTable where ${req.body.type} like "%${req.body.search}%" LIMIT ${req.body.offset}, ${req.body.limit}`
-            let sql2 = `SELECT COUNT(*) from imgTable where ${req.body.type} like "%${req.body.search}%"`
+            let sql = `SELECT * from developer where ${req.body.type} like "%${req.body.search}%" LIMIT ${req.body.offset}, ${req.body.limit}`
+            let sql2 = `SELECT COUNT(*) from developer where ${req.body.type} like "%${req.body.search}%"`
             connection.query(sql, (err, result) => {
                 if (err) return res.json({ status: 500, message: 'search list call server error' })
+                console.log('check ', result)
                 if (!result) return res.json({ status: 404, message: 'not content' })
-
                 connection.query(sql2, (err2, result2) => {
                     if (err2) return res.json({ status: 500, message: 'total err' })
                     let total = result2[0]['COUNT(*)']
                     return res.json({
                         status: 200,
-                        message: 'get title search imgList success',
+                        message: 'get title search developerList success',
                         result,
                         total
                     })
@@ -62,21 +62,13 @@ module.exports = app => {
         }
     })
 
-    app.post('/imgInsert', upload.single('file'), (req, res) => {
+    app.post('/developerInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
-        let sql = `INSERT INTO imgTable(title, sub_title, content, img) VALUE ('${data.title}', '${data.place}', '${data.content}', '${req.file.filename}')`
+        console.log('check me!', data)
+        let sql = `INSERT INTO developer(title, sub_title, content, sample, img) VALUE ('${data.title}', '${data.place}','${data.content}', '${data.sample}', '${req.file.filename}')`
         connection.query(sql, (err, result) => {
-            if (err) return res.json({ status: 500, message: 'insert image server error' })
+            if (err) return res.json({ status: 500, message: 'insert developer server error' })
             return res.json({ status: 200, message: 'success data insert' })
-        })
-    })
-
-    app.post('/deleteImg', (req, res) => {
-        let seq = `delete from imgtable where seq =${req.body.seq}`
-        connection.query(seq, (err, result) => {
-            if (err) return res.json({ status: 500, message: 'delete image server error' })
-            fs.unlinkSync(path.join(__dirname, `../images/imgBoard/${req.body.img}`))
-            return res.json({ status: 200, message: 'success delete image' })
         })
     })
 }

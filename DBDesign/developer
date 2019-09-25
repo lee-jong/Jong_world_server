@@ -1,0 +1,9 @@
+create table developer (
+   seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   title varchar(30),
+   sub_title varchar(30),
+   content varchar(300),
+   sample varchar(30),
+   date timestamp not null default now(),
+   img varchar(500)
+)
