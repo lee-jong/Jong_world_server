@@ -26,7 +26,6 @@ module.exports = app => {
             let sql2 = `SELECT COUNT(*) from developer`
             connection.query(sql, (err, result) => {
                 if (err) return res.json({ status: 500, message: 'list call server error' })
-                console.log('???')
                 if (result.length === 0) return res.json({ status: 404, message: 'not content' })
                 connection.query(sql2, (err2, result2) => {
                     if (err2) return res.json({ status: 500, message: 'total err' })
@@ -46,7 +45,6 @@ module.exports = app => {
             let sql2 = `SELECT COUNT(*) from developer where ${req.body.type} like "%${req.body.search}%"`
             connection.query(sql, (err, result) => {
                 if (err) return res.json({ status: 500, message: 'search list call server error' })
-                console.log('check ', result)
                 if (!result) return res.json({ status: 404, message: 'not content' })
                 connection.query(sql2, (err2, result2) => {
                     if (err2) return res.json({ status: 500, message: 'total err' })
@@ -62,9 +60,16 @@ module.exports = app => {
         }
     })
 
+    app.post('/developerDetail', (req, res) => {
+        let sql = `SELECT * FROM developer where seq=${req.body.seq}`
+        connection.query(sql, (err, result) => {
+            if (err) return res.json({ status: 500, message: 'detail developer server error' })
+            return res.json({ status: 200, message: 'success data info', result })
+        })
+    })
+
     app.post('/developerInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
-        console.log('check me!', data)
         let sql = `INSERT INTO developer(title, sub_title, content, sample, img) VALUE ('${data.title}', '${data.place}','${data.content}', '${data.sample}', '${req.file.filename}')`
         connection.query(sql, (err, result) => {
             if (err) return res.json({ status: 500, message: 'insert developer server error' })
