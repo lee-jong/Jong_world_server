@@ -21,7 +21,8 @@ const upload = multer({ storage: storage })
 
 module.exports = app => {
     app.post('/developerList', (req, res) => {
-        if (!req.body.limit || !req.body.offset) return res.json({ status: 402, message: 'go wrong request' })
+        if (!req.body.limit || req.body.offset === undefined)
+            return res.json({ status: 402, message: 'go wrong request' })
 
         if (!req.body.search) {
             let sql = `SELECT * from developer orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
@@ -75,16 +76,17 @@ module.exports = app => {
     app.post('/developerDelete', (req, res) => {
         if (!req.body.seq) return res.json({ status: 402, message: 'go wrong request' })
 
-        let sql = `DELETE FROM developer from seq=${req.body.seq}`
+        let sql = `DELETE FROM developer where seq=${req.body.seq}`
         connection.query(sql, (err, result) => {
-            if (err) return res.json({ status: 500, message: 'delete developer server error' })
+            if (err) return res.json({ status: 500, message: 'delete developer server error', err })
+            fs.unlinkSync(path.join(__dirname, `../images/developerBoard/${req.body.img}`))
             return res.json({ status: 200, message: 'success delete info' })
         })
     })
 
     app.post('/developerInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
-        if (!data.title || !data.place || !data.content || !data.sample || !req.file.filename)
+        if (!data.title || !data.place || !data.content || !req.file.filename)
             return res.json({ status: 402, message: 'go wrong request' })
 
         let sql = `INSERT INTO developer(title, sub_title, content, sample, img) VALUE ('${data.title}', '${data.place}','${data.content}', '${data.sample}', '${req.file.filename}')`
