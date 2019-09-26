@@ -21,6 +21,8 @@ const upload = multer({ storage: storage })
 
 module.exports = app => {
     app.post('/imgBoard', (req, res) => {
+        if (!req.body.offset || !req.body.limit) return res.json({ status: 402, message: 'go wrong request' })
+
         if (!req.body.search) {
             let sql = `SELECT * from imgTable orders LIMIT ${req.body.limit} OFFSET ${req.body.offset}`
             let sql2 = `SELECT COUNT(*) from imgTable`
@@ -63,6 +65,9 @@ module.exports = app => {
 
     app.post('/imgInsert', upload.single('file'), (req, res) => {
         let data = JSON.parse(req.body.info)
+        if (!data.title || !data.place || !data.content || !req.file.filename)
+            return res.json({ status: 402, message: 'go wrong request' })
+
         let sql = `INSERT INTO imgTable(title, sub_title, content, img) VALUE ('${data.title}', '${data.place}', '${data.content}', '${req.file.filename}')`
         connection.query(sql, (err, result) => {
             if (err) return res.json({ status: 500, message: 'insert image server error' })
@@ -71,6 +76,8 @@ module.exports = app => {
     })
 
     app.post('/deleteImg', (req, res) => {
+        if (!req.body.seq) return res.json({ status: 402, message: 'go wrong request' })
+
         let seq = `delete from imgtable where seq =${req.body.seq}`
         connection.query(seq, (err, result) => {
             if (err) return res.json({ status: 500, message: 'delete image server error' })
