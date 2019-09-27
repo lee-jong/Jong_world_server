@@ -23,6 +23,8 @@ const imgboard = require('./action/imgboard')
 imgboard(app)
 const developer = require('./action/developer')
 developer(app)
+const login = require('./action/login')
+login(app)
 
 io.on('connection', function(socket) {
     console.log('user connected')
