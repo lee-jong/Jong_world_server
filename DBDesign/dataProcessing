@@ -1,0 +1,29 @@
+사업장 리스트
+create table BEList (
+   seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY,   
+   BE_name varchar(30),                   // 사업장명
+   BE_BE_name varchar(30),                // 사업자명
+   BE_address varchar(50),                // 사업장 주소
+   BE_BLN varchar(30),                    // 사업자 번호
+   BE_phone varchar(30),                  // 사업자 휴대폰 번호
+   date timestamp not null default now()  // 등록일
+)
+
+매출 리스트
+create table salesList (
+   seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+   S_name varchar(30),                    // 사업장명
+   S_BE_name varchar(30),                 // 사업자명
+   S_item varchar(300),                   // 품목
+   S_amount int(200),                     // 판매 갯수
+   S_salest int(255)                      // 매출약
+)
+
+품목 리스트
+create table itemList (
+   seq INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   I_name varchar(30),                    // 품목명
+   I_amount int(200),                     // 품목 갯수
+   I_prime_cost int (255),                // 원가
+   I_salest int(255)                      // 판매가
+)
