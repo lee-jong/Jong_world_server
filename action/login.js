@@ -1,8 +1,6 @@
 const mysql = require('mysql')
 const dbconfig = require('../config/database')
 const connection = mysql.createConnection(dbconfig)
-const path = require('path')
-const fs = require('fs')
 const jwt = require('jsonwebtoken')
 
 module.exports = app => {

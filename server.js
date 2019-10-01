@@ -25,6 +25,8 @@ const developer = require('./action/developer')
 developer(app)
 const login = require('./action/login')
 login(app)
+const dataProcessing = require('./action/dataProcessing')
+dataProcessing(app)
 
 io.on('connection', function(socket) {
     console.log('user connected')
