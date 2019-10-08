@@ -29,18 +29,26 @@ const dataProcessing = require('./action/dataProcessing')
 dataProcessing(app)
 
 io.on('connection', function(socket) {
-    console.log('user connected')
-
-    let name = 'user' + count++
-    io.to(socket.id).emit('change', name)
+    console.log('user connected', socket.id)
 
     socket.on('disconnect', function() {
         console.log('user disconnect', socket.id)
     })
 
+    socket.on('call', msg => {
+        socket.broadcast.emit('offer', msg)
+    })
+
+    socket.on('answer', answer => {
+        socket.broadcast.emit('answer', answer)
+    })
+
+    socket.on('icecandidate', icecandidate => {
+        socket.broadcast.emit('icecandidate', icecandidate)
+    })
+
     socket.on('send', function(name, text) {
         let msg = name + ' : ' + text
-        console.log('msg', msg)
         io.emit('receive', msg)
     })
 })

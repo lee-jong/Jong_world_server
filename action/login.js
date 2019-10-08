@@ -22,6 +22,7 @@ module.exports = app => {
             if (err) {
                 return res.json({ status: 401, message: 'Token is not valid' })
             } else {
+                console.log('check', decoded)
                 return res.json({ status: 200, message: 'Token is valid', decoded })
             }
         })
